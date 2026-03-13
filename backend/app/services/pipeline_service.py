@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pathlib import Path
 
 from app.jobs.events import SSEBroadcaster
 from app.jobs.store import JobStore
@@ -12,6 +13,10 @@ from app.services.script_service import ScriptService
 from app.services.stitch_service import StitchService
 from app.services.storyboard_service import StoryboardService
 from app.services.video_service import VideoService
+
+import json
+import os
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +62,11 @@ class PipelineService:
             # Mark job as running
             self.job_store.update_job(job_id, status=JobStatus.RUNNING)
             self.broadcaster.emit(job_id, SSEEventType.JOB_STARTED)
+
+            is_mock = self.job_store.settings.mock_ai_calls
+
+            if is_mock:
+                logger.info("PIPELINE RUNNING IN MOCK MODE")
 
             # Step 1: Script generation
             self.job_store.set_progress(job_id, JobStep.SCRIPT, 1, "Generating script...")

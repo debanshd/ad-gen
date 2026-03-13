@@ -45,6 +45,25 @@ class AvatarService:
         3. Save each variant to output/{run_id}/avatar_variants/variant_{n}.png
         4. Return AvatarResponse with list of AvatarVariant
         """
+        if self.settings.mock_ai_calls:
+            import asyncio
+            import shutil
+            logger.info("AVATAR GENERATION IN MOCK MODE")
+            await asyncio.sleep(1)
+            
+            # Physically save/copy placeholder images so select_avatar works
+            sample_source = self.storage.base_dir / "samples" / "running_shoes.png"
+            num = num_variants or self.settings.max_avatar_variants
+            variants = []
+            for i in range(num):
+                dest_path = self.storage.get_path(run_id, f"variant_{i}.png", subdir="avatar_variants")
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                if sample_source.exists():
+                    shutil.copy2(str(sample_source), str(dest_path))
+                variants.append(AvatarVariant(index=i, image_path=self.storage.to_url_path(str(dest_path))))
+            
+            return AvatarResponse(run_id=run_id, variants=variants)
+
         effective_variants = num_variants or self.settings.max_avatar_variants
 
         if custom_prompt:

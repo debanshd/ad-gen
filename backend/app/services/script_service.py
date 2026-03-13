@@ -39,6 +39,77 @@ class ScriptService:
         """
         run_id = request.run_id or uuid.uuid4().hex[:12]
 
+        if self.settings.mock_ai_calls:
+            import asyncio
+            import shutil
+            from app.models.script import VideoScript, AvatarProfile, Scene
+            
+            logger.info("SCRIPT GENERATION IN MOCK MODE")
+            await asyncio.sleep(2)
+            
+            # Load product image details if possible
+            samples_path = Path(self.settings.output_dir) / "samples" / "samples.json"
+            product_image_url = str(request.image_url)
+            product_name = request.product_name
+            
+            sample_source = None
+            if samples_path.exists():
+                with open(samples_path, "r") as f:
+                    samples_data = json.load(f)
+                    for s in samples_data:
+                        if s["product_name"].lower() in product_name.lower():
+                            product_image_url = s["image_url"]
+                            # e.g. /output/samples/running_shoes.png -> samples/running_shoes.png
+                            if "/output/" in product_image_url:
+                                rel_path = product_image_url.split("/output/")[-1]
+                                sample_source = self.storage.base_dir / rel_path
+                            break
+
+            # IMPORTANT: Physically save/copy product image to run directory so StoryboardService finds it
+            if sample_source and sample_source.exists():
+                dest_path = self.storage.get_path(run_id, "product_image.png")
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(str(sample_source), str(dest_path))
+                product_image_url = self.storage.to_url_path(str(dest_path))
+            elif Path(str(request.image_url)).exists():
+                # If they provided a local file, copy it
+                ext = Path(str(request.image_url)).suffix.lstrip(".") or "png"
+                dest_path = self.storage.get_path(run_id, f"product_image.{ext}")
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(str(request.image_url), str(dest_path))
+                product_image_url = self.storage.to_url_path(str(dest_path))
+
+            scenes = [
+                Scene(
+                    scene_number=i + 1,
+                    duration_seconds=8,
+                    scene_type="ad",
+                    shot_type="medium",
+                    camera_movement="dolly",
+                    lighting="cinematic",
+                    visual_background="Studio",
+                    avatar_action="talking",
+                    avatar_emotion="excited",
+                    product_visual_integration="close-up",
+                    script_dialogue=f"Scene {i+1} dialogue for {product_name}",
+                    sound_design="Background beat"
+                ) for i in range(request.scene_count)
+            ]
+            script = VideoScript(
+                video_title=f"Mock: {product_name}",
+                avatar_profile=AvatarProfile(
+                    gender="neutral", age_range="25-30", attire="business casual", 
+                    tone_of_voice="friendly", visual_description="A modern AI spokesperson"
+                ),
+                scenes=scenes
+            )
+            
+            return ScriptResponse(
+                run_id=run_id,
+                product_image_path=product_image_url,
+                script=script,
+            )
+
         image_url = str(request.image_url)
 
         # Load image bytes — local /output/ path or HTTP download
