@@ -145,6 +145,26 @@ Run `make help` for all available commands.
 
 <br>
 
+## Zero-Cost Mock Mode
+
+For development without incurring API costs (Gemini, Imagen, Veo), you can enable the "Zero-Cost Mock Mode". This simulates the entire pipeline with pre-generated samples and simulated delays.
+
+### 1. Enable
+Set `MOCK_AI_CALLS=true` in your `backend/.env` file.
+
+### 2. Verify
+Run the backend verification script to test the entire pipeline locally without the UI:
+```bash
+cd backend
+. .venv/bin/activate
+python verify_mock_backend.py
+```
+
+### 3. Usage
+Click **Generate** in the UI as normal. Script generation, avatar creation, storyboard QC, and video generation will all use mock data and complete in seconds.
+
+<br>
+
 ## Models
 
 | Model | ID | Purpose |
