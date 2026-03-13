@@ -1,0 +1,37 @@
+# Environment
+.env
+.env.local
+
+# AI agent tooling (local-only config and state)
+.claude/
+.agents/
+.demo/
+.playwright-mcp/
+.playwright-screenshots/
+.docs/
+.gemini/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+backend/.venv/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Generated assets (local storage) — ignore everything except sample images
+/output/
+backend/output/*
+!backend/output/samples/
+
+# Google Cloud SDK (local)
+google-cloud-sdk/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store

@@ -1,0 +1,192 @@
+import { create } from 'zustand';
+import type {
+  Job,
+  ScriptRequest,
+  VideoScript,
+  AvatarVariant,
+  StoryboardResult,
+  VideoResult,
+  LogEntry,
+} from '../types';
+
+interface PipelineState {
+  activeStep: number;
+  runId: string | null;
+  originalRequest: ScriptRequest | null;
+  script: VideoScript | null;
+  avatarVariants: AvatarVariant[];
+  selectedAvatarIndex: number | null;
+  storyboardResults: StoryboardResult[];
+  videoResults: VideoResult[];
+  finalVideoPath: string | null;
+  logs: LogEntry[];
+  isLoading: boolean;
+  error: string | null;
+  veoSeed: number | null;
+  veoResolution: string;
+  aspectRatio: string;
+
+  setStep: (step: number) => void;
+  setRunId: (runId: string) => void;
+  setScript: (script: VideoScript) => void;
+  setAvatars: (variants: AvatarVariant[]) => void;
+  selectAvatar: (index: number) => void;
+  setStoryboard: (results: StoryboardResult[]) => void;
+  setVideos: (results: VideoResult[]) => void;
+  selectVideoVariant: (sceneNumber: number, variantIndex: number, selectedPath: string) => void;
+  updateStoryboardScene: (sceneNumber: number, result: StoryboardResult) => void;
+  updateVideoScene: (sceneNumber: number, result: VideoResult) => void;
+  addOrUpdateStoryboardScene: (result: StoryboardResult) => void;
+  addOrUpdateVideoScene: (result: VideoResult) => void;
+  setFinalVideo: (path: string) => void;
+  addLog: (message: string, level: LogEntry['level']) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  setVeoSeed: (seed: number | null) => void;
+  setVeoResolution: (resolution: string) => void;
+  setAspectRatio: (ratio: string) => void;
+  loadJob: (job: Job) => void;
+  reset: () => void;
+}
+
+const initialState = {
+  activeStep: 0,
+  runId: null,
+  originalRequest: null as ScriptRequest | null,
+  script: null,
+  avatarVariants: [],
+  selectedAvatarIndex: null,
+  storyboardResults: [],
+  videoResults: [],
+  finalVideoPath: null,
+  logs: [],
+  isLoading: false,
+  error: null,
+  veoSeed: null as number | null,
+  veoResolution: '720p',
+  aspectRatio: '9:16',
+};
+
+export const usePipelineStore = create<PipelineState>((set) => ({
+  ...initialState,
+
+  setStep: (step) => set({ activeStep: step }),
+
+  setRunId: (runId) => set({ runId }),
+
+  setScript: (script) => set({ script }),
+
+  setAvatars: (variants) => set({ avatarVariants: variants }),
+
+  selectAvatar: (index) => set({ selectedAvatarIndex: index }),
+
+  setStoryboard: (results) => set({ storyboardResults: results }),
+
+  setVideos: (results) => set({ videoResults: results }),
+
+  selectVideoVariant: (sceneNumber, variantIndex, selectedPath) =>
+    set((state) => ({
+      videoResults: state.videoResults.map((r) =>
+        r.scene_number === sceneNumber
+          ? { ...r, selected_index: variantIndex, selected_video_path: selectedPath }
+          : r,
+      ),
+    })),
+
+  updateStoryboardScene: (sceneNumber, result) =>
+    set((state) => ({
+      storyboardResults: state.storyboardResults.map((r) =>
+        r.scene_number === sceneNumber ? result : r,
+      ),
+    })),
+
+  updateVideoScene: (sceneNumber, result) =>
+    set((state) => ({
+      videoResults: state.videoResults.map((r) =>
+        r.scene_number === sceneNumber ? result : r,
+      ),
+    })),
+
+  addOrUpdateStoryboardScene: (result) =>
+    set((state) => {
+      const exists = state.storyboardResults.some(
+        (r) => r.scene_number === result.scene_number,
+      );
+      return {
+        storyboardResults: exists
+          ? state.storyboardResults.map((r) =>
+              r.scene_number === result.scene_number ? result : r,
+            )
+          : [...state.storyboardResults, result].sort(
+              (a, b) => a.scene_number - b.scene_number,
+            ),
+      };
+    }),
+
+  addOrUpdateVideoScene: (result) =>
+    set((state) => {
+      const exists = state.videoResults.some(
+        (r) => r.scene_number === result.scene_number,
+      );
+      return {
+        videoResults: exists
+          ? state.videoResults.map((r) =>
+              r.scene_number === result.scene_number ? result : r,
+            )
+          : [...state.videoResults, result].sort(
+              (a, b) => a.scene_number - b.scene_number,
+            ),
+      };
+    }),
+
+  setFinalVideo: (path) => set({ finalVideoPath: path }),
+
+  addLog: (message, level) =>
+    set((state) => ({
+      logs: [
+        ...state.logs,
+        {
+          timestamp: new Date().toISOString(),
+          message,
+          level,
+        },
+      ],
+    })),
+
+  setLoading: (loading) => set({ isLoading: loading }),
+
+  setError: (error) => set({ error }),
+
+  setVeoSeed: (seed) => set({ veoSeed: seed }),
+
+  setVeoResolution: (resolution) => set({ veoResolution: resolution }),
+
+  setAspectRatio: (ratio) => set({ aspectRatio: ratio }),
+
+  loadJob: (job) => {
+    // Compute the furthest step with data
+    let step = 0;
+    if (job.script) step = 1;
+    if (job.avatar_variants && job.avatar_variants.length > 0) step = 2;
+    if (job.storyboard_results && job.storyboard_results.length > 0) step = 3;
+    if (job.video_results && job.video_results.length > 0) step = 4;
+    if (job.final_video_path) step = 5;
+
+    set({
+      runId: job.job_id,
+      originalRequest: job.request ?? null,
+      script: job.script ?? null,
+      avatarVariants: job.avatar_variants ?? [],
+      selectedAvatarIndex: null,
+      storyboardResults: job.storyboard_results ?? [],
+      videoResults: job.video_results ?? [],
+      finalVideoPath: job.final_video_path ?? null,
+      activeStep: step,
+      logs: [],
+      isLoading: false,
+      error: null,
+    });
+  },
+
+  reset: () => set(initialState),
+}));
