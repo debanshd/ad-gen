@@ -20,6 +20,27 @@ class StitchService:
     async def stitch_videos(
         self, run_id: str, transitions: list[dict] | None = None
     ) -> str:
+        """Stitch all selected scene videos into a final commercial."""
+        # Check if mock mode is enabled via a settings injection or global check
+        # StitchService doesn't have settings, so we'll check via env or job store if possible.
+        # But wait, looking at pipeline_service, we can pass settings or just check env.
+        import os
+        if os.getenv("MOCK_AI_CALLS", "false").lower() == "true":
+            import asyncio
+            import shutil
+            logger.info("VIDEO STITCHING IN MOCK MODE")
+            await asyncio.sleep(2)
+            
+            mock_source = self.storage.base_dir / "6gp0s595xs8" / "final" / "commercial.mp4"
+            dest_dir = self.storage.ensure_run_dir(run_id) / "final"
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            dest_file = dest_dir / "commercial.mp4"
+            
+            if mock_source.exists():
+                shutil.copy2(str(mock_source), str(dest_file))
+            
+            return self.storage.to_url_path(str(dest_file))
+
         """Stitch all selected scene videos into a final commercial.
 
         1. Check ffmpeg availability
