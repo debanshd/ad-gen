@@ -125,12 +125,12 @@ By coupling specialized models for asset generation with self-reflecting, advers
 
 \section{System Architecture and Implementation}
 
-\begin{figure}[htbp]
+\begin{figure*}[t]
   \centering
-  \includegraphics[width=0.8\columnwidth]{figure1}
+  \includegraphics[width=\textwidth]{figure1}
   \caption{The Genflow Ad Studio Directed Acyclic Graph (DAG)}
   \label{fig:dag}
-\end{figure}
+\end{figure*}
 
 Genflow is engineered as a Compound AI System, moving beyond isolated zero-shot inference toward a robust, state-managed execution pipeline \cite{wu2023autogen}. The architecture operates primarily as a Directed Acyclic Graph (DAG) for data ingestion and script orchestration \cite{khattab2024dspy, chase2023langchain}, which subsequently transitions into a cyclic, adversarial evaluation loop during the generation phase. This section details the three primary subsystems that constitute the Genflow pipeline: deterministic constraint extraction, latent state orchestration, and concurrent multi-agent validation.
 
