@@ -139,6 +139,7 @@ make stop            # Kill both servers
 make check           # Type-check backend + frontend + validate assets
 make test            # Full system test (API + frontend + auth)
 make reset-db        # Fix schema errors after model changes
+make test-prompts    # Run automated prompt reliability evaluation (CAIS 2026)
 ```
 
 Run `make help` for all available commands.

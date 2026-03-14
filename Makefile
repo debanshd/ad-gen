@@ -150,6 +150,10 @@ test-api:
 	@echo "All smoke tests passed."
 	@echo "API docs: http://localhost:8000/docs"
 
+test-prompts:
+	@echo "Running Prompt Reliability Evaluation (CAIS 2026)..."
+	@cd backend && . .venv/bin/activate && python scripts/evaluate_prompts.py
+
 # ─── Deploy ─────────────────────────────────────
 deploy:
 	@echo "Building and deploying to Cloud Run..."
