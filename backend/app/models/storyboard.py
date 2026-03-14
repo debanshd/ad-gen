@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 from app.models.common import QCScore
 from app.models.script import Scene
+from app.models.qc import VideoQCDimension
 
 
 class StoryboardRequest(BaseModel):
@@ -17,8 +18,22 @@ class StoryboardRequest(BaseModel):
 
 
 class StoryboardQCReport(BaseModel):
-    avatar_validation: QCScore
-    product_validation: QCScore
+    """Storyboard QC report aligned with Video QC 'War Room' schema."""
+    model_config = {"extra": "ignore"}
+
+    technical_distortion: VideoQCDimension | None = Field(default=None, alias="technical_distortion")
+    cinematic_imperfections: VideoQCDimension | None = Field(default=None, alias="cinematic_imperfections")
+    avatar_consistency: VideoQCDimension | None = Field(default=None, alias="avatar_consistency")
+    product_consistency: VideoQCDimension | None = Field(default=None, alias="product_consistency")
+    temporal_coherence: VideoQCDimension | None = Field(default=None, alias="temporal_coherence")
+    hand_body_integrity: VideoQCDimension | None = Field(default=None, alias="hand_body_integrity")
+    brand_text_accuracy: VideoQCDimension | None = Field(default=None, alias="brand_text_accuracy")
+    overall_verdict: str = "PASS"
+    debate_log: list[dict] = []
+
+    # Backward compatibility fields (deprecated)
+    avatar_validation: QCScore | None = None
+    product_validation: QCScore | None = None
     composition_quality: QCScore | None = None
 
 

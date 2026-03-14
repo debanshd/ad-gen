@@ -15,6 +15,8 @@ from app.services.storyboard_service import StoryboardService
 from app.services.video_service import VideoService
 from app.services.stitch_service import StitchService
 from app.storage.local import LocalStorage
+from app.services.qc_service import QCService
+from app.ai.gemini import GeminiService
 
 # Mock dependencies as needed or use real ones if they are simple
 async def main():
@@ -26,10 +28,12 @@ async def main():
     storage = LocalStorage(settings.output_dir)
     
     # Initialize services with placeholders for complex deps
-    script_svc = ScriptService(gemini=None, storage=storage, settings=settings)
+    gemini_svc = GeminiService(client=None, settings=settings)
+    qc_svc = QCService(gemini=gemini_svc, settings=settings)
+    script_svc = ScriptService(gemini=gemini_svc, storage=storage, settings=settings)
     avatar_svc = AvatarService(gemini_image=None, imagen=None, storage=storage, settings=settings)
-    storyboard_svc = StoryboardService(gemini_image=None, qc=None, storage=storage, settings=settings)
-    video_svc = VideoService(veo=None, gcs=None, qc=None, storage=storage, settings=settings)
+    storyboard_svc = StoryboardService(gemini_image=None, qc=qc_svc, storage=storage, settings=settings)
+    video_svc = VideoService(veo=None, gcs=None, qc=qc_svc, storage=storage, settings=settings)
     stitch_svc = StitchService(storage=storage)
 
     # 1. Test Script
@@ -76,6 +80,19 @@ async def main():
     print("\n5. Testing Stitching...")
     final_video_url = await stitch_svc.stitch_videos(run_id)
     print(f"   Success! Final video: {final_video_url}")
+
+    # 6. Test Multi-Agent Debate Mode
+    print("\n6. Testing Multi-Agent Debate QC...")
+    os.environ["USE_AGENT_DEBATE"] = "true"
+    debate_report = await qc_svc.multi_agent_evaluate_video(
+        video_uri="gs://mock/video.mp4",
+        reference_uri="gs://mock/image.png",
+        original_prompt="A professional commercial for running shoes."
+    )
+    print(f"   Success! Overall Verdict: {debate_report.overall_verdict}")
+    print(f"   Debate Log Size: {len(debate_report.debate_log)}")
+    for entry in debate_report.debate_log:
+        print(f"   - {entry['agent']}: {entry['thought'][:60]}...")
 
     print("\n--- Backend-Only Mock Verification COMPLETED! ---")
 

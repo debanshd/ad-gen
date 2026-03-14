@@ -151,3 +151,29 @@ class GeminiImageService:
                 return part.inline_data.data
 
         raise ValueError("No image data in storyboard response")
+
+    @async_retry(retries=3)
+    async def enhance_image(self, image_bytes: bytes) -> bytes:
+        """Enhance a product image using Gemini 3 Flash Image (Nano Banana 2)."""
+        prompt = (
+            "A professional, high-fidelity studio product photograph of this item. "
+            "Cinematic lighting, clean background, 8k resolution, broadcast commercial quality."
+        )
+        image_part = types.Part.from_bytes(data=image_bytes, mime_type="image/png")
+        text_part = types.Part.from_text(text=prompt)
+
+        response = await self.client.aio.models.generate_content(
+            model=self.settings.gemini_flash_model,
+            contents=[image_part, text_part],
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE"],
+                safety_settings=ALL_SAFETY_OFF,
+                temperature=1.0,
+            ),
+        )
+
+        for part in response.candidates[0].content.parts:
+            if part.inline_data and part.inline_data.data:
+                return part.inline_data.data
+
+        raise ValueError("No enhanced image data in response")

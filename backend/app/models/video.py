@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 from app.models.script import AvatarProfile, Scene
 from app.models.storyboard import StoryboardResult
+from app.models.qc import VideoQCDimension, VideoQCReport
 
 
 class VideoRequest(BaseModel):
@@ -21,29 +22,6 @@ class VideoRequest(BaseModel):
     use_reference_images: bool = True
     negative_prompt_extra: str = ""
     generate_audio: bool = True
-
-
-class VideoQCDimension(BaseModel):
-    score: int = Field(ge=0, le=10)
-    reasoning: str
-
-
-class VideoQCReport(BaseModel):
-    """Video QC report with 7 scoring dimensions.
-
-    All dimensions are optional with None defaults for backward compatibility —
-    old job data persisted before a dimension was added can still be loaded.
-    """
-    model_config = {"extra": "ignore"}
-
-    technical_distortion: VideoQCDimension | None = None
-    cinematic_imperfections: VideoQCDimension | None = None
-    avatar_consistency: VideoQCDimension | None = None
-    product_consistency: VideoQCDimension | None = None
-    temporal_coherence: VideoQCDimension | None = None
-    hand_body_integrity: VideoQCDimension | None = None
-    brand_text_accuracy: VideoQCDimension | None = None
-    overall_verdict: str = ""
 
 
 class VideoVariant(BaseModel):

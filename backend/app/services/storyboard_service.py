@@ -95,13 +95,8 @@ class StoryboardService:
                 subdir=f"scenes/scene_{scene.scene_number}",
             )
 
-            from app.models.common import QCScore
-            from app.models.storyboard import StoryboardQCReport
-            dummy_qc = StoryboardQCReport(
-                avatar_validation=QCScore(score=100, reason="Mock pass"),
-                product_validation=QCScore(score=100, reason="Mock pass"),
-                composition_quality=QCScore(score=100, reason="Mock pass"),
-            )
+            # Enable multi-agent debate even in mock mode for demo "excitement"
+            dummy_qc = await self.qc.mock_multi_agent_evaluate_storyboard(run_id)
 
             result = StoryboardResult(
                 scene_number=scene.scene_number,
@@ -157,25 +152,34 @@ class StoryboardService:
                 image_size=image_size,
             )
 
-            qc_report = await self.qc.qc_storyboard(
+            qc_report = await self.qc.multi_agent_evaluate_storyboard(
                 avatar_bytes=avatar_bytes,
                 product_bytes=product_bytes,
                 storyboard_bytes=image_bytes,
+                original_prompt=prompt,
             )
 
-            if best_qc_report is None or (
-                qc_report.avatar_validation.score + qc_report.product_validation.score
-                > best_qc_report.avatar_validation.score + best_qc_report.product_validation.score
+            # Check if this attempt passes
+            is_passing = self.qc.storyboard_passes_qc(
+                qc_report,
+                threshold=qc_threshold,
+                include_composition=include_composition_qc,
+            )
+
+            # Update best if first attempt, better score, or it's a pass
+            if (
+                best_qc_report is None 
+                or is_passing 
+                or (
+                    qc_report.avatar_validation.score + qc_report.product_validation.score
+                    > best_qc_report.avatar_validation.score + best_qc_report.product_validation.score
+                )
             ):
                 best_image_bytes = image_bytes
                 best_qc_report = qc_report
                 best_prompt = prompt
 
-            if self.qc.storyboard_passes_qc(
-                qc_report,
-                threshold=qc_threshold,
-                include_composition=include_composition_qc,
-            ):
+            if is_passing:
                 logger.info("Scene %d passed QC on attempt %d", scene.scene_number, attempt + 1)
                 break
 

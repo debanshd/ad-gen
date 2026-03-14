@@ -99,6 +99,9 @@ video advertisement script for the following product.
 PRODUCT: {product_name}
 SPECIFICATIONS: {specs}
 
+BRAND DNA (Follow these attributes religiously):
+{brand_dna}
+
 CREATIVE DIRECTION: {ad_tone}
 
 NARRATIVE ARC ({scene_count} scenes, ~{target_duration} seconds total):
@@ -433,3 +436,48 @@ camera movement complexity, add "continuous smooth motion"
 
 IMPROVED PROMPT:\
 """
+
+# ---------------------------------------------------------------------------
+# Multi-Agent Debate QC
+# ---------------------------------------------------------------------------
+
+DIRECTOR_AGENT_INSTRUCTION = (
+    "You are a professional film director and VFX supervisor. Your role is to "
+    "critically evaluate the CINEMATIC QUALITY of this AI-generated video. "
+    "Ignore brand/product details for now; focus strictly on:\n"
+    "1. Temporal Coherence (fluid movement, no sudden jumps/warping)\n"
+    "2. Cinematic Quality (lighting, composition, camera stability)\n"
+    "3. Human Fidelity (natural expressions, anatomy, lip-sync)\n\n"
+    "You MUST output ONLY a valid JSON object with the following structure:\n"
+    '{"verdict": "PASS or FAIL", "reasoning": "Technical justification here"}'
+)
+
+BRAND_AGENT_INSTRUCTION = (
+    "You are a Brand Manager and Product Marketing Lead. Your role is to "
+    "critically evaluate the BRAND CONSISTENCY of this AI-generated video. "
+    "Focus strictly on:\n"
+    "1. Product Fidelity (matches reference image exactly, no morphing)\n"
+    "2. Brand Values (tone, product visibility, premium feel)\n"
+    "3. On-screen Text/Labels (stability and accuracy of any visible text)\n\n"
+    "You MUST output ONLY a valid JSON object with the following structure:\n"
+    '{"verdict": "PASS or FAIL", "reasoning": "Justification focusing on the brand image here"}'
+)
+
+ORCHESTRATOR_AGENT_INSTRUCTION = (
+    "You are an Executive Producer. Your role is to synthesize the reports of the "
+    "Director and Brand Manager to make a final decision on a video commercial scene. "
+    "You will be given the original prompt and the feedback from both agents. "
+    "You MUST resolve any conflicts and provide a final VideoQCReport in JSON format.\n\n"
+    "If the final verdict is FAIL, you MUST also provide an improved prompt that "
+    "addresses the specific issues raised by the agents.\n\n"
+    "Expected Output JSON Format:\n"
+    '{"technical_distortion": {"score": 0-10, "reasoning": "..."}, '
+    '"cinematic_imperfections": {"score": 0-10, "reasoning": "..."}, '
+    '"avatar_consistency": {"score": 0-10, "reasoning": "..."}, '
+    '"product_consistency": {"score": 0-10, "reasoning": "..."}, '
+    '"temporal_coherence": {"score": 0-10, "reasoning": "..."}, '
+    '"hand_body_integrity": {"score": 0-10, "reasoning": "..."}, '
+    '"brand_text_accuracy": {"score": 0-10, "reasoning": "..."}, '
+    '"overall_verdict": "PASS or FAIL", '
+    '"revised_prompt": "Newly optimized prompt if verdict is FAIL"}'
+)

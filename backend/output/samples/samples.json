@@ -4,7 +4,17 @@
     "product_name": "AeroGlide Pro Running Shoes",
     "specifications": "Weight: 215g (men's size 10)\nDrop: 8mm (heel-to-toe)\nMidsole: ZoomX foam with carbon fiber plate\nUpper: Engineered mesh with Flyknit collar\nOutsole: Rubber waffle pattern for road + light trail\nColors: Volt/Black, Arctic Blue/White, Sunset Orange\nKey Features: Energy return, responsive cushioning, breathable fit\nPrice: $179.99",
     "image_url": "http://localhost:8000/output/samples/running_shoes.png",
-    "thumbnail": "/output/samples/running_shoes.png"
+    "thumbnail": "/output/samples/running_shoes.png",
+    "debate_log": [
+      {
+        "agent": "Director",
+        "thought": "Cinematic quality is excellent. Motion is smooth and lighting is consistent."
+      },
+      {
+        "agent": "Brand Manager",
+        "thought": "Product visibility is perfect. The AeroGlide logo is clearly visible."
+      }
+    ]
   },
   {
     "id": "espresso_machine",

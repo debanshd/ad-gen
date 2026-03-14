@@ -136,6 +136,12 @@ def get_veo_service() -> VeoService:
 # ---------------------------------------------------------------------------
 
 @lru_cache
+def get_scraper_service() -> ScraperService:
+    from app.services.scraper_service import ScraperService
+    return ScraperService(gemini=get_gemini_service())
+
+
+@lru_cache
 def get_input_service() -> InputService:
     return InputService(
         gemini=get_gemini_service(),
@@ -217,8 +223,11 @@ def get_pipeline_service() -> PipelineService:
         video_svc=get_video_service(),
         stitch_svc=get_stitch_service(),
         review_svc=get_review_service(),
+        scraper_svc=get_scraper_service(),
+        gemini_image_svc=get_gemini_image_service(),
         job_store=get_job_store(),
         event_broadcaster=get_broadcaster(),
+        settings=get_settings(),
     )
 
 

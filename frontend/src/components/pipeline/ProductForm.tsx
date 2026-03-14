@@ -58,6 +58,7 @@ export default function ProductForm({ onSubmit, isLoading, readOnly = false, ini
     scene_count: 3,
     ad_tone: 'energetic',
     gemini_model: 'gemini-3-flash-preview',
+    brand_url: '',
   });
   const [selectedSample, setSelectedSample] = useState<string | null>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -537,6 +538,20 @@ export default function ProductForm({ onSubmit, isLoading, readOnly = false, ini
             fullWidth
             required
             disabled={isLoading || readOnly}
+          />
+          <TextField
+            label="Brand Website URL (Optional)"
+            value={formData.brand_url || ''}
+            onChange={handleChange('brand_url')}
+            fullWidth
+            disabled={isLoading || readOnly}
+            placeholder="https://www.nike.com"
+            helperText="Used to extract your brand's tone, demographic, and core messaging"
+            InputProps={{
+              startAdornment: (
+                <LinkIcon sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }} />
+              ),
+            }}
           />
 
           <TextField

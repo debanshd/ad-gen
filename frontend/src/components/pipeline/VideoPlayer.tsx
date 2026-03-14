@@ -33,6 +33,7 @@ import type { SelectChangeEvent } from '@mui/material';
 import { ArrowForward, EmojiEvents, CheckCircle, Refresh, ExpandMore, ExpandLess, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import QCBadge from '../qc/QCBadge';
 import QCDetailPanel from '../qc/QCDetailPanel';
+import RegenerationLog from '../qc/RegenerationLog';
 import type { VideoResult, VideoGenerateOptions } from '../../types';
 import { usePipelineStore } from '../../store/pipelineStore';
 import { VEO_MODELS, DEFAULT_NUM_VIDEO_VARIANTS, DEFAULT_VIDEO_QC_THRESHOLD, DEFAULT_MAX_VIDEO_QC_REGEN } from '../../constants/controls';
@@ -618,18 +619,19 @@ export default function VideoPlayer({
                         />
                         <Box sx={{ mt: 2 }}>
                           <QCDetailPanel
-                          dimensions={[
-                            { label: 'Technical', dim: variant.qc_report.technical_distortion },
-                            { label: 'Cinematic', dim: variant.qc_report.cinematic_imperfections },
-                            { label: 'Avatar', dim: variant.qc_report.avatar_consistency },
-                            { label: 'Product', dim: variant.qc_report.product_consistency },
-                            { label: 'Temporal', dim: variant.qc_report.temporal_coherence },
-                            { label: 'Hands/Body', dim: variant.qc_report.hand_body_integrity },
-                            { label: 'Brand/Text', dim: variant.qc_report.brand_text_accuracy },
-                          ]
-                            .filter((d) => d.dim != null)
-                            .map((d) => ({ label: d.label, score: d.dim!.score, reasoning: d.dim!.reasoning }))}
-                        />
+                            dimensions={[
+                              { label: 'Technical', dim: variant.qc_report.technical_distortion },
+                              { label: 'Cinematic', dim: variant.qc_report.cinematic_imperfections },
+                              { label: 'Avatar', dim: variant.qc_report.avatar_consistency },
+                              { label: 'Product', dim: variant.qc_report.product_consistency },
+                              { label: 'Temporal', dim: variant.qc_report.temporal_coherence },
+                              { label: 'Hands/Body', dim: variant.qc_report.hand_body_integrity },
+                              { label: 'Brand/Text', dim: variant.qc_report.brand_text_accuracy },
+                            ]
+                              .filter((d) => d.dim != null)
+                              .map((d) => ({ label: d.label, score: d.dim!.score, reasoning: d.dim!.reasoning }))}
+                          />
+                          <RegenerationLog debateLog={variant.qc_report.debate_log} />
                         </Box>
                       </Box>
                     )}

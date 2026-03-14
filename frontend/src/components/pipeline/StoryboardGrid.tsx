@@ -65,15 +65,20 @@ export default function StoryboardGrid({
   const avgAvatarScore =
     hasResults
       ? Math.round(
-          results.reduce((sum, r) => sum + r.qc_report.avatar_validation.score, 0) /
-            results.length
+          results.reduce((sum, r) => {
+            const score = r.qc_report.avatar_consistency?.score ?? (r.qc_report.avatar_validation.score / 10);
+            return sum + score;
+          }, 0) / results.length
         )
       : 0;
+
   const avgProductScore =
     hasResults
       ? Math.round(
-          results.reduce((sum, r) => sum + r.qc_report.product_validation.score, 0) /
-            results.length
+          results.reduce((sum, r) => {
+            const score = r.qc_report.product_consistency?.score ?? (r.qc_report.product_validation.score / 10);
+            return sum + score;
+          }, 0) / results.length
         )
       : 0;
 
@@ -381,31 +386,49 @@ export default function StoryboardGrid({
                   </Box>
                   <CardContent sx={{ pb: 1 }}>
                     <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                      <QCBadge score={result.qc_report.avatar_validation.score} label="Avatar" />
-                      <QCBadge score={result.qc_report.product_validation.score} label="Product" />
+                      <QCBadge 
+                        score={result.qc_report.avatar_consistency?.score ?? (result.qc_report.avatar_validation.score / 10)} 
+                        label="Avatar" 
+                        isTenScale={!!result.qc_report.avatar_consistency}
+                      />
+                      <QCBadge 
+                        score={result.qc_report.product_consistency?.score ?? (result.qc_report.product_validation.score / 10)} 
+                        label="Product" 
+                        isTenScale={!!result.qc_report.product_consistency}
+                      />
                     </Box>
                     <QCDetailPanel
-                      dimensions={[
-                        {
-                          label: 'Avatar Validation',
-                          score: result.qc_report.avatar_validation.score,
-                          reasoning: result.qc_report.avatar_validation.reason,
-                        },
-                        {
-                          label: 'Product Validation',
-                          score: result.qc_report.product_validation.score,
-                          reasoning: result.qc_report.product_validation.reason,
-                        },
-                        ...(result.qc_report.composition_quality
-                          ? [
-                              {
-                                label: 'Composition',
-                                score: result.qc_report.composition_quality.score,
-                                reasoning: result.qc_report.composition_quality.reason,
-                              },
-                            ]
-                          : []),
-                      ]}
+                      dimensions={
+                        result.qc_report.technical_distortion ? [
+                          { label: 'Technical Distortion', ...result.qc_report.technical_distortion },
+                          { label: 'Cinematic Quality', ...result.qc_report.cinematic_imperfections! },
+                          { label: 'Avatar Consistency', ...result.qc_report.avatar_consistency! },
+                          { label: 'Product Fidelity', ...result.qc_report.product_consistency! },
+                          { label: 'Hand/Body Integrity', ...result.qc_report.hand_body_integrity! },
+                          { label: 'Brand & Text', ...result.qc_report.brand_text_accuracy! },
+                        ] : [
+                          {
+                            label: 'Avatar Validation',
+                            score: result.qc_report.avatar_validation.score,
+                            reasoning: result.qc_report.avatar_validation.reason,
+                          },
+                          {
+                            label: 'Product Validation',
+                            score: result.qc_report.product_validation.score,
+                            reasoning: result.qc_report.product_validation.reason,
+                          },
+                          ...(result.qc_report.composition_quality
+                            ? [
+                                {
+                                  label: 'Composition',
+                                  score: result.qc_report.composition_quality.score,
+                                  reasoning: result.qc_report.composition_quality.reason,
+                                },
+                              ]
+                            : []),
+                        ]
+                      }
+                      debateLog={result.qc_report.debate_log}
                     />
                     {/* Prompt used — expandable */}
                     {result.prompt_used && (

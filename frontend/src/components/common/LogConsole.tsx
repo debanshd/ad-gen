@@ -27,6 +27,13 @@ export default function LogConsole() {
     return d.toLocaleTimeString('en-US', { hour12: false });
   };
 
+  const getLogColor = (message: string, level: string) => {
+    if (message.includes('[DIRECTOR]')) return '#00bcd4'; // Cyan
+    if (message.includes('[BRAND]')) return '#e91e63';    // Pink
+    if (message.includes('[ORCHESTRATOR]')) return '#9c27b0'; // Purple
+    return LEVEL_COLORS[level] || LEVEL_COLORS.info;
+  };
+
   return (
     <Paper
       sx={{
@@ -101,7 +108,7 @@ export default function LogConsole() {
                 <Typography
                   component="span"
                   sx={{
-                    color: LEVEL_COLORS[log.level] || LEVEL_COLORS.info,
+                    color: getLogColor(log.message, log.level),
                     fontFamily: '"Roboto Mono", monospace',
                     fontSize: 13,
                     wordBreak: 'break-word',

@@ -58,6 +58,7 @@ async def start_pipeline(
 async def generate_script(
     request: ScriptRequest,
     script_svc: ScriptService = Depends(get_script_service),
+    pipeline_svc: PipelineService = Depends(get_pipeline_service),
     job_store: JobStore = Depends(get_job_store),
 ) -> ScriptResponse:
     """Generate script only (synchronous). Creates a job for persistence."""
@@ -65,11 +66,17 @@ async def generate_script(
     if not request.run_id:
         import uuid
         request = request.model_copy(update={"run_id": uuid.uuid4().hex[:12]})
+    
     token = pipeline_run_id.set(request.run_id)
     try:
-        response = await script_svc.generate_script(request)
         # Create job using run_id so file paths and job_id match
-        job_store.create_job(request, job_id=response.run_id)
+        job_store.create_job(request, job_id=request.run_id)
+        
+        # Phase 0: Initial Assets (Pomelli-lite)
+        request = await pipeline_svc.prepare_initial_assets(request.run_id, request)
+        
+        response = await script_svc.generate_script(request)
+        # Update job with the actual script results
         job_store.update_job(response.run_id, script=response.script, status=JobStatus.RUNNING)
         return response
     except Exception as exc:

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from app.models.brand import BrandDNA
 
 class ScriptRequest(BaseModel):
     product_name: str
@@ -10,6 +10,8 @@ class ScriptRequest(BaseModel):
     gemini_model: str | None = None
     max_dialogue_words_per_scene: int = Field(default=25, ge=10, le=50)
     custom_instructions: str = Field(default="")
+    brand_url: str | None = None
+    brand_dna: BrandDNA | None = None
     run_id: str | None = None  # Pre-generated run_id for SSE log streaming
 
 
@@ -78,6 +80,7 @@ class SampleProduct(BaseModel):
     specifications: str
     image_url: str
     thumbnail: str
+    debate_log: list[dict] = []
 
 
 class ImageUploadResponse(BaseModel):

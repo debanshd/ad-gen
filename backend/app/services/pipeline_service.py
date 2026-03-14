@@ -2,6 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 
+from app.config import Settings
 from app.jobs.events import SSEBroadcaster
 from app.jobs.store import JobStore
 from app.models.job import JobStatus, JobStep
@@ -13,6 +14,8 @@ from app.services.script_service import ScriptService
 from app.services.stitch_service import StitchService
 from app.services.storyboard_service import StoryboardService
 from app.services.video_service import VideoService
+from app.services.scraper_service import ScraperService
+from app.ai.gemini_image import GeminiImageService
 
 import json
 import os
@@ -35,8 +38,11 @@ class PipelineService:
         video_svc: VideoService,
         stitch_svc: StitchService,
         review_svc: ReviewService,
+        scraper_svc: ScraperService,
+        gemini_image_svc: GeminiImageService,
         job_store: JobStore,
         event_broadcaster: SSEBroadcaster,
+        settings: Settings,
     ):
         self.script_svc = script_svc
         self.avatar_svc = avatar_svc
@@ -44,32 +50,82 @@ class PipelineService:
         self.video_svc = video_svc
         self.stitch_svc = stitch_svc
         self.review_svc = review_svc
+        self.scraper_svc = scraper_svc
+        self.gemini_image_svc = gemini_image_svc
         self.job_store = job_store
         self.broadcaster = event_broadcaster
+        self.settings = settings
+
+
+    async def prepare_initial_assets(self, job_id: str, request: ScriptRequest) -> ScriptRequest:
+        """Extract Brand DNA and enhance image. Shared by full and step-by-step pipeline."""
+        is_mock = self.settings.mock_ai_calls
+
+        # 1. Brand DNA Extraction
+        if request.brand_url:
+            self.job_store.set_progress(job_id, JobStep.BRAND_DNA, 1, "Extracting Brand DNA...")
+            self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "brand_dna"})
+            brand_dna = await self.scraper_svc.scrape_brand_dna(request.brand_url)
+            self.job_store.update_job(job_id, brand_dna=brand_dna)
+            request.brand_dna = brand_dna
+            # Attach for script service fallback
+            request.custom_instructions = (request.custom_instructions or "") + \
+                f"\n\nSTRICT BRAND DNA ATTACHED (FOLLOW RELIGIOUSLY):\n{brand_dna.model_dump_json()}"
+            self.broadcaster.emit(job_id, SSEEventType.STEP_COMPLETED, {"step": "brand_dna"})
+            logger.info(f"Brand DNA extracted for {request.brand_url}")
+        else:
+            self.broadcaster.emit(job_id, SSEEventType.STEP_COMPLETED, {"step": "brand_dna", "skipped": True})
+
+        # 2. Photoshoot Enhancement
+        self.job_store.set_progress(job_id, JobStep.ENHANCEMENT, 2, "Enhancing product image...")
+        self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "enhancement"})
+        try:
+            # Resolve image path
+            img_rel = request.image_url.lstrip("/")
+            img_path = Path(self.settings.output_dir) / img_rel
+            if img_path.exists():
+                with open(img_path, "rb") as f:
+                    image_bytes = f.read()
+                
+                if is_mock:
+                    enhanced_bytes = image_bytes # Mock: just use original
+                else:
+                    enhanced_bytes = await self.gemini_image_svc.enhance_image(image_bytes)
+                
+                enhanced_rel = f"{job_id}/enhanced_product.jpg"
+                enhanced_abs = Path(self.settings.output_dir) / enhanced_rel
+                enhanced_abs.parent.mkdir(parents=True, exist_ok=True)
+                with open(enhanced_abs, "wb") as f:
+                    f.write(enhanced_bytes)
+                
+                self.job_store.update_job(job_id, enhanced_image_path=enhanced_rel)
+                request.image_url = enhanced_rel
+                logger.info("Product image enhanced and saved")
+        except Exception as e:
+            logger.error(f"Image enhancement failed: {e}")
+        
+        self.broadcaster.emit(job_id, SSEEventType.STEP_COMPLETED, {"step": "enhancement"})
+        return request
 
     async def run_full_pipeline(self, job_id: str, request: ScriptRequest):
         """Run the full automated pipeline as a background task.
-
-        Steps:
-        1. Generate script
-        2. Generate avatar variants
-        3. Wait for avatar selection
-        4. Generate storyboard with QC
-        5. Generate videos with QC
-        6. Stitch final commercial
+        ...
         """
         try:
             # Mark job as running
             self.job_store.update_job(job_id, status=JobStatus.RUNNING)
             self.broadcaster.emit(job_id, SSEEventType.JOB_STARTED)
 
-            is_mock = self.job_store.settings.mock_ai_calls
+            is_mock = self.settings.mock_ai_calls
 
             if is_mock:
                 logger.info("PIPELINE RUNNING IN MOCK MODE")
 
-            # Step 1: Script generation
-            self.job_store.set_progress(job_id, JobStep.SCRIPT, 1, "Generating script...")
+            # Phase 0: Initial Assets
+            request = await self.prepare_initial_assets(job_id, request)
+
+            # Step 3: Script generation
+            self.job_store.set_progress(job_id, JobStep.SCRIPT, 3, "Generating script...")
             self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "script"})
 
             script_response = await self.script_svc.generate_script(request)
@@ -82,8 +138,8 @@ class PipelineService:
                 {"step": "script", "run_id": run_id},
             )
 
-            # Step 2: Avatar generation
-            self.job_store.set_progress(job_id, JobStep.AVATAR, 2, "Generating avatar variants...")
+            # Step 4: Avatar generation
+            self.job_store.set_progress(job_id, JobStep.AVATAR, 4, "Generating avatar variants...")
             self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "avatar"})
 
             avatar_response = await self.avatar_svc.generate_avatars(
@@ -101,9 +157,9 @@ class PipelineService:
                 },
             )
 
-            # Step 3: Wait for avatar selection
+            # Step 5: Wait for avatar selection
             self.job_store.set_progress(
-                job_id, JobStep.AVATAR_SELECTION, 3, "Waiting for avatar selection..."
+                job_id, JobStep.AVATAR_SELECTION, 5, "Waiting for avatar selection..."
             )
             self.broadcaster.emit(
                 job_id,
@@ -119,9 +175,9 @@ class PipelineService:
                 {"step": "avatar_selection", "selected": selected_avatar},
             )
 
-            # Step 4: Storyboard generation with QC
+            # Step 6: Storyboard generation with QC
             self.job_store.set_progress(
-                job_id, JobStep.STORYBOARD, 4, "Generating storyboard..."
+                job_id, JobStep.STORYBOARD, 6, "Generating storyboard..."
             )
             self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "storyboard"})
 
@@ -146,8 +202,8 @@ class PipelineService:
                 },
             )
 
-            # Step 5: Video generation with QC
-            self.job_store.set_progress(job_id, JobStep.VIDEO, 5, "Generating videos...")
+            # Step 7: Video generation with QC
+            self.job_store.set_progress(job_id, JobStep.VIDEO, 7, "Generating videos...")
             self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "video"})
 
             def video_progress(data: dict):
@@ -171,8 +227,8 @@ class PipelineService:
                 },
             )
 
-            # Step 6: Stitch
-            self.job_store.set_progress(job_id, JobStep.STITCH, 6, "Stitching final video...")
+            # Step 8: Stitch
+            self.job_store.set_progress(job_id, JobStep.STITCH, 8, "Stitching final video...")
             self.broadcaster.emit(job_id, SSEEventType.STEP_STARTED, {"step": "stitch"})
 
             final_path = await self.stitch_svc.stitch_videos(run_id=run_id)
@@ -186,6 +242,9 @@ class PipelineService:
                 SSEEventType.STEP_COMPLETED,
                 {"step": "stitch", "path": final_path},
             )
+
+            # Done
+            self.job_store.set_progress(job_id, JobStep.REVIEW, 9, "Pipeline complete")
 
             # Done
             self.job_store.update_job(job_id, status=JobStatus.COMPLETED)

@@ -10,7 +10,8 @@ from app.ai.veo import VeoService
 from app.config import Settings
 from app.models.script import AvatarProfile, Scene
 from app.models.storyboard import StoryboardResult
-from app.models.video import VideoQCReport, VideoResponse, VideoResult, VideoVariant
+from app.models.qc import VideoQCReport
+from app.models.video import VideoResponse, VideoResult, VideoVariant
 from app.services.qc_service import QCService
 from app.storage.gcs import GCSStorage
 from app.storage.local import LocalStorage
@@ -138,6 +139,28 @@ class VideoService:
         scene_num = sb_result.scene_number
         effective_variants = num_variants or self.settings.max_video_variants
 
+        # Construct prompt early so it's available for QC (both mock and real)
+        voice_style = scene.voice_style or avatar_profile.voice_style or avatar_profile.tone_of_voice
+        detailed_desc = scene.detailed_avatar_description or avatar_profile.visual_description
+        template = VIDEO_PROMPT_TEMPLATE_REFERENCE if use_reference_images else VIDEO_PROMPT_TEMPLATE_IMAGE
+        prompt = template.format(
+            detailed_avatar_description=detailed_desc,
+            visual_background=scene.visual_background,
+            lighting=scene.lighting,
+            shot_type=scene.shot_type,
+            avatar_action=scene.avatar_action,
+            avatar_emotion=scene.avatar_emotion,
+            camera_movement=scene.camera_movement,
+            product_visual_integration=scene.product_visual_integration,
+            voice_style=voice_style,
+            script_dialogue=scene.script_dialogue,
+            sound_design=scene.sound_design,
+            audio_continuity=scene.audio_continuity or "",
+        )
+
+        if previous_qc_report:
+            prompt = await self.qc.rewrite_video_prompt(prompt, previous_qc_report)
+
         if self.settings.mock_ai_calls:
             logger.info("VIDEO GENERATION IN MOCK MODE")
             await asyncio.sleep(5)
@@ -156,6 +179,27 @@ class VideoService:
             if mock_source.exists():
                 shutil.copy2(str(mock_source), str(selected_lp))
                 
+            qc_tasks = []
+            import os
+            use_debate = os.getenv("USE_AGENT_DEBATE") == "true"
+            for i in range(len(variants)):
+                if use_debate:
+                    qc_tasks.append(self.qc.multi_agent_evaluate_video(
+                        video_uri="gs://mock/video.mp4", 
+                        reference_uri="gs://mock/image.png",
+                        original_prompt=prompt
+                    ))
+                else:
+                    qc_tasks.append(self.qc.qc_video(
+                        video_uri="gs://mock/video.mp4", 
+                        reference_uri="gs://mock/image.png"
+                    ))
+            
+            qc_results = await asyncio.gather(*qc_tasks, return_exceptions=True)
+            for i, result in enumerate(qc_results):
+                if not isinstance(result, Exception):
+                    variants[i].qc_report = result
+
             result = VideoResult(
                 scene_number=scene_num,
                 variants=variants,
@@ -187,26 +231,9 @@ class VideoService:
         if prev_scene_last_frame_gcs:
             asset_image_uris.append(prev_scene_last_frame_gcs)
 
-        voice_style = scene.voice_style or avatar_profile.voice_style or avatar_profile.tone_of_voice
-        detailed_desc = scene.detailed_avatar_description or avatar_profile.visual_description
-        template = VIDEO_PROMPT_TEMPLATE_REFERENCE if use_reference_images else VIDEO_PROMPT_TEMPLATE_IMAGE
-        prompt = template.format(
-            detailed_avatar_description=detailed_desc,
-            visual_background=scene.visual_background,
-            lighting=scene.lighting,
-            shot_type=scene.shot_type,
-            avatar_action=scene.avatar_action,
-            avatar_emotion=scene.avatar_emotion,
-            camera_movement=scene.camera_movement,
-            product_visual_integration=scene.product_visual_integration,
-            voice_style=voice_style,
-            script_dialogue=scene.script_dialogue,
-            sound_design=scene.sound_design,
-            audio_continuity=scene.audio_continuity or "",
-        )
-
         if previous_qc_report:
-            prompt = await self.qc.rewrite_video_prompt(prompt, previous_qc_report)
+            # Note: already handled above, but keeping for real flow logic if needed or just skip
+            pass
 
         scene_negative = scene.negative_elements or ""
         if negative_prompt_extra:
@@ -238,7 +265,22 @@ class VideoService:
         await asyncio.gather(*(asyncio.to_thread(self.gcs.download_to_local, uri, str(lp)) for uri, lp in zip(video_gcs_uris, local_paths)))
         variants = [VideoVariant(index=i, video_path=self.storage.to_url_path(str(lp))) for i, lp in enumerate(local_paths)]
 
-        qc_tasks = [self.qc.qc_video(video_uri=video_gcs_uris[i], reference_uri=product_gcs_uri) for i in range(len(variants))]
+        qc_tasks = []
+        import os
+        use_debate = os.getenv("USE_AGENT_DEBATE") == "true"
+        for i in range(len(variants)):
+            if use_debate:
+                qc_tasks.append(self.qc.multi_agent_evaluate_video(
+                    video_uri=video_gcs_uris[i], 
+                    reference_uri=product_gcs_uri,
+                    original_prompt=prompt
+                ))
+            else:
+                qc_tasks.append(self.qc.qc_video(
+                    video_uri=video_gcs_uris[i], 
+                    reference_uri=product_gcs_uri
+                ))
+        
         qc_results = await asyncio.gather(*qc_tasks, return_exceptions=True)
         for i, result in enumerate(qc_results):
             if not isinstance(result, Exception):

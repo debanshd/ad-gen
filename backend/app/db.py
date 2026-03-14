@@ -32,6 +32,8 @@ class Database:
                     storyboard_results_json TEXT,
                     video_results_json TEXT,
                     final_video_path TEXT,
+                    brand_dna_json TEXT,
+                    enhanced_image_path TEXT,
                     error TEXT
                 );
 

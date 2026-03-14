@@ -1,3 +1,4 @@
+import json
 import logging
 
 from google import genai
@@ -56,6 +57,7 @@ class GeminiService:
         model_id: str | None = None,
         max_words: int = 25,
         custom_instructions: str = "",
+        brand_dna: dict | None = None,
     ) -> dict:
         """Generate video script using Gemini with structured JSON output.
 
@@ -71,6 +73,7 @@ class GeminiService:
             narrative_arc=build_narrative_arc(scene_count, target_duration),
             ad_tone=ad_tone,
             max_words=max_words,
+            brand_dna=json.dumps(brand_dna, indent=2) if brand_dna else "Standard commercial brand identity",
         )
 
         if custom_instructions:
@@ -87,6 +90,35 @@ class GeminiService:
                 response_mime_type="application/json",
                 safety_settings=ALL_SAFETY_OFF,
                 temperature=1.0,
+            ),
+        )
+
+        return parse_json_response(response.text)
+
+    @async_retry(retries=3)
+    async def extract_brand_dna(self, scraped_text: str) -> dict:
+        """Extract BrandDNA (tone, demographic, messaging) from scraped text using Flash."""
+        prompt = (
+            "Analyze the following website text and extract the brand's DNA. "
+            "Focus on their tone of voice, who they are targeting, and their core value proposition. "
+            "Return ONLY valid JSON with no additional text.\n\n"
+            "Text from website:\n"
+            f"{scraped_text[:5000]}\n\n"
+            "JSON Format:\n"
+            '{"tone_of_voice": "e.g. bold, inspiring, technical", '
+            '"target_demographic": "e.g. professional athletes, gen-z, corporate leaders", '
+            '"core_messaging": "e.g. excellence through innovation, community-first streetwear"}'
+        )
+
+        text_part = types.Part.from_text(text=prompt)
+
+        response = await self.client.aio.models.generate_content(
+            model=self.settings.gemini_flash_model,
+            contents=[text_part],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                safety_settings=ALL_SAFETY_OFF,
+                temperature=0.7,
             ),
         )
 
@@ -146,6 +178,98 @@ class GeminiService:
         )
 
         return parse_json_response(response.text)
+
+    @async_retry(retries=3)
+    async def analyze_storyboard_with_instruction(
+        self,
+        avatar_bytes: bytes,
+        product_bytes: bytes,
+        storyboard_bytes: bytes,
+        system_instruction: str,
+        user_prompt: str,
+    ) -> str:
+        """Generic storyboard analysis with specific instructions (Multi-Agent)."""
+        if self.settings.mock_ai_calls:
+            import json
+            if "Director" in system_instruction:
+                return json.dumps({"verdict": "PASS", "reasoning": "The composition is visually striking, using professional lighting that highlights the subject well."})
+            elif "Brand" in system_instruction:
+                return json.dumps({"verdict": "FAIL", "reasoning": "The product label appears slightly distorted in the background, which could confuse customers."})
+            else: # Orchestrator
+                return json.dumps({
+                    "avatar_validation": {"score": 92, "reason": "Avatar fidelity is high; matches reference perfectly."},
+                    "product_validation": {"score": 65, "reason": "Product label distortion noted by Brand Manager requires correction."},
+                    "composition_quality": {"score": 88, "reason": "Cinematic framing is excellent."},
+                    "overall_verdict": "FAIL"
+                })
+
+        avatar_part = types.Part.from_bytes(data=avatar_bytes, mime_type="image/png")
+        product_part = types.Part.from_bytes(data=product_bytes, mime_type="image/png")
+        storyboard_part = types.Part.from_bytes(data=storyboard_bytes, mime_type="image/png")
+        text_part = types.Part.from_text(text=user_prompt)
+
+        response = await self.client.aio.models.generate_content(
+            model=self.settings.gemini_flash_model,
+            contents=[avatar_part, product_part, storyboard_part, text_part],
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                safety_settings=ALL_SAFETY_OFF,
+                temperature=1.0,
+            ),
+        )
+
+        return response.text.strip()
+
+    @async_retry(retries=3)
+    async def analyze_video_with_instruction(
+        self, video_uri: str, system_instruction: str, user_prompt: str = "Evaluate this video content."
+    ) -> str:
+        """Analyze video using Gemini 3 Flash with a custom system instruction.
+        
+        Returns the raw text response (useful for agents sharing 'thoughts').
+        """
+        if self.settings.mock_ai_calls:
+            import json
+            # Simulate a disagreement: Director PASS, Brand FAIL (occasionally)
+            if "DIRECTOR" in system_instruction:
+                return json.dumps({
+                    "verdict": "PASS",
+                    "reasoning": "The motion is exceptionally fluid. Cinematic lighting remains stable with no flickering in the background."
+                })
+            elif "BRAND" in system_instruction:
+                return json.dumps({
+                    "verdict": "FAIL",
+                    "reasoning": "The product logo on the shoe appears to warp slightly between seconds 2 and 4. This is a critical brand fidelity issue."
+                })
+            else: # Orchestrator
+                return json.dumps({
+                    "technical_distortion": {"score": 9, "reasoning": "Mock tech pass"},
+                    "cinematic_imperfections": {"score": 8, "reasoning": "Mock cinematic pass"},
+                    "avatar_consistency": {"score": 9, "reasoning": "Mock avatar pass"},
+                    "product_consistency": {"score": 5, "reasoning": "Logo warping detected by Brand Manager"},
+                    "temporal_coherence": {"score": 9, "reasoning": "Mock temporal pass"},
+                    "hand_body_integrity": {"score": 8, "reasoning": "Mock hand pass"},
+                    "brand_text_accuracy": {"score": 4, "reasoning": "Logo fidelity is compromised"},
+                    "overall_verdict": "FAIL",
+                    "revised_prompt": "Crystal clear, sharp product logo on the AeroGlide shoe, ultra-stable textures, high-fidelity branding."
+                })
+
+        video_part = types.Part.from_uri(
+            file_uri=video_uri, mime_type="video/mp4"
+        )
+        text_part = types.Part.from_text(text=user_prompt)
+
+        response = await self.client.aio.models.generate_content(
+            model=self.settings.gemini_flash_model,
+            contents=[video_part, text_part],
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                safety_settings=ALL_SAFETY_OFF,
+                temperature=1.0,
+            ),
+        )
+
+        return response.text.strip()
 
     @async_retry(retries=3)
     async def qc_video(

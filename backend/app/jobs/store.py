@@ -90,7 +90,8 @@ class JobStore:
                 """UPDATE jobs SET status=?, updated_at=?, request_json=?,
                    progress_json=?, script_json=?, avatar_variants_json=?,
                    selected_avatar=?, storyboard_results_json=?,
-                   video_results_json=?, final_video_path=?, error=?
+                   video_results_json=?, final_video_path=?,
+                   brand_dna_json=?, enhanced_image_path=?, error=?
                    WHERE job_id=?""",
                 (
                     job.status.value if isinstance(job.status, JobStatus) else job.status,
@@ -103,6 +104,8 @@ class JobStore:
                     json.dumps([r.model_dump() for r in job.storyboard_results]) if job.storyboard_results else None,
                     json.dumps([r.model_dump() for r in job.video_results]) if job.video_results else None,
                     job.final_video_path,
+                    json.dumps(job.brand_dna.model_dump()) if job.brand_dna else None,
+                    job.enhanced_image_path,
                     job.error,
                     job.job_id,
                 ),
@@ -120,6 +123,7 @@ class JobStore:
         data["avatar_variants"] = json.loads(data.pop("avatar_variants_json")) if data.get("avatar_variants_json") else None
         data["storyboard_results"] = json.loads(data.pop("storyboard_results_json")) if data.get("storyboard_results_json") else None
         data["video_results"] = json.loads(data.pop("video_results_json")) if data.get("video_results_json") else None
+        data["brand_dna"] = json.loads(data.pop("brand_dna_json")) if data.get("brand_dna_json") else None
         # Remove None fields to let Pydantic handle defaults
         data = {k: v for k, v in data.items() if v is not None}
         return Job(**data)

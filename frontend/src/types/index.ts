@@ -7,6 +7,7 @@ export interface ScriptRequest {
   gemini_model?: string;
   max_dialogue_words_per_scene?: number;
   custom_instructions?: string;
+  brand_url?: string;
   run_id?: string;
 }
 
@@ -97,6 +98,17 @@ export interface QCScore {
 }
 
 export interface StoryboardQCReport {
+  technical_distortion?: VideoQCDimension;
+  cinematic_imperfections?: VideoQCDimension;
+  avatar_consistency?: VideoQCDimension;
+  product_consistency?: VideoQCDimension;
+  temporal_coherence?: VideoQCDimension;
+  hand_body_integrity?: VideoQCDimension;
+  brand_text_accuracy?: VideoQCDimension;
+  overall_verdict: string;
+  debate_log?: DebateEntry[];
+  
+  // Backward compatibility
   avatar_validation: QCScore;
   product_validation: QCScore;
   composition_quality?: QCScore;
@@ -138,6 +150,13 @@ export interface VideoQCDimension {
   reasoning: string;
 }
 
+export interface DebateEntry {
+  agent: string;
+  verdict: string;
+  reasoning: string;
+  timestamp: string;
+}
+
 export interface VideoQCReport {
   technical_distortion?: VideoQCDimension;
   cinematic_imperfections?: VideoQCDimension;
@@ -147,6 +166,7 @@ export interface VideoQCReport {
   hand_body_integrity?: VideoQCDimension;
   brand_text_accuracy?: VideoQCDimension;
   overall_verdict: string;
+  debate_log?: DebateEntry[];
 }
 
 export interface VideoVariant {

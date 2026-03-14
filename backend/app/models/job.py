@@ -3,6 +3,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
+from app.models.brand import BrandDNA
 from app.models.avatar import AvatarVariant
 from app.models.script import ScriptRequest, VideoScript
 from app.models.storyboard import StoryboardResult
@@ -18,6 +19,8 @@ class JobStatus(str, Enum):
 
 
 class JobStep(str, Enum):
+    BRAND_DNA = "brand_dna"
+    ENHANCEMENT = "enhancement"
     SCRIPT = "script"
     AVATAR = "avatar"
     AVATAR_SELECTION = "avatar_selection"
@@ -30,7 +33,7 @@ class JobStep(str, Enum):
 class JobProgress(BaseModel):
     current_step: JobStep
     step_index: int
-    total_steps: int = 7
+    total_steps: int = 9
     detail: str = ""
 
 
@@ -47,4 +50,6 @@ class Job(BaseModel):
     storyboard_results: list[StoryboardResult] | None = None
     video_results: list[VideoResult] | None = None
     final_video_path: str | None = None
+    brand_dna: BrandDNA | None = None
+    enhanced_image_path: str | None = None
     error: str | None = None

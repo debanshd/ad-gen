@@ -42,7 +42,6 @@ class ScriptService:
         if self.settings.mock_ai_calls:
             import asyncio
             import shutil
-            from app.models.script import VideoScript, AvatarProfile, Scene
             
             logger.info("SCRIPT GENERATION IN MOCK MODE")
             await asyncio.sleep(2)
@@ -154,6 +153,7 @@ class ScriptService:
             model_id=request.gemini_model,
             max_words=request.max_dialogue_words_per_scene,
             custom_instructions=request.custom_instructions,
+            brand_dna=request.brand_dna.model_dump() if request.brand_dna else None,
         )
 
         # Parse into VideoScript model
