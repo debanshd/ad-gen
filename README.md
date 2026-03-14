@@ -211,7 +211,7 @@ With the backend running, visit **http://localhost:8000/docs** for interactive S
 
 ### Authors
 
-[**Sunil Kumar**](https://www.linkedin.com/in/sunilkumar88/) &bull; [**Gopala Dhar**](https://www.linkedin.com/in/gopaladhar/) &bull; [**Lavi Nigam**](https://www.linkedin.com/in/lavinigam/) &bull; [**Debanshu Das**](https://www.linkedin.com/in/debanshd/)
+[**Sunil Kumar**](https://www.linkedin.com/in/sunilkumar88/) &bull; [**Gopala Dhar**](https://www.linkedin.com/in/gopaladhar/) &bull; [**Lavi Nigam**](https://www.linkedin.com/in/lavinigam/)
 
 <sub>Built with Gemini, Veo, Imagen &amp; FFmpeg on Google Cloud.</sub>
 <sub> A Gemini use-case demonstration. Not an official Google product.</sub>
