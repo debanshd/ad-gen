@@ -5,6 +5,7 @@ const AUTHORS = [
   { name: 'Sunil Kumar', url: 'https://www.linkedin.com/in/sunilkumar88/' },
   { name: 'Gopala Dhar', url: 'https://www.linkedin.com/in/gopaladhar/' },
   { name: 'Lavi Nigam', url: 'https://www.linkedin.com/in/lavinigam/' },
+  { name: 'Debanshu Das', url: 'https://www.linkedin.com/in/debanshd/' },
 ];
 
 export default function Footer() {
