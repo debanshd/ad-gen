@@ -34,7 +34,11 @@ def get_settings() -> Settings:
 
 @lru_cache
 def get_genai_client() -> genai.Client:
+    import os
     settings = get_settings()
+    api_key = os.getenv("GEMINI_API_KEY") or settings.gemini_api_key
+    if api_key:
+        return genai.Client(api_key=api_key)
     return genai.Client(
         vertexai=True,
         project=settings.project_id,
