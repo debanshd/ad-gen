@@ -161,7 +161,7 @@ Following the generation of a scene by Veo, the pipeline suspends the standard D
     \item[The Brand Safety Agent:] This highly constrained VLM scans the output specifically for enterprise policy violations. It checks for typographical hallucinations in rendered text, structural distortions of the product geometry, and deviations from the extracted BrandDNA hex color parameters.
 \end{description}
 
-If both agents return valid for compliance, the scene is committed to the final output buffer. However, if a conflict arises or a violation is detected, an ``Orchestrator'' agent is invoked \cite{liu2024visual}. The Orchestrator ingests the specific critiques (e.g., ``The typography on the central object is garbled in frame 24'') and synthesizes a corrective, negative-weighted prompt. The system then loops back, passing this revised prompt to Veo to regenerate the specific scene.
+If both agents return valid for compliance, the scene is committed to the final output buffer. However, if a conflict arises or a violation is detected, an ``Orchestrator'' agent is invoked \cite{liu2023visual}. The Orchestrator ingests the specific critiques (e.g., ``The typography on the central object is garbled in frame 24'') and synthesizes a corrective, negative-weighted prompt. The system then loops back, passing this revised prompt to Veo to regenerate the specific scene.
 
 Implementing this cyclic, multi-agent evaluation introduces a non-trivial trade-off between system latency and output quality. While traditional single-pass generation yields an asset with a linear inference cost, our adversarial loop operates with a highly variable latency multiplier based on the number of required refinement iterations. This fundamentally increases the total pipeline execution time and computational overhead. However, in enterprise environments where the cost of a brand violation significantly outweighs the cost of increased generation time, prioritizing deterministic quality over raw throughput is a necessary and acceptable systems engineering compromise.
 
@@ -311,8 +311,8 @@ Andreas Blattmann, Robin Rombach, Huan Ling, et al. 2023. Align Your Latents: Hi
 \bibitem{geminiteam2024gemini}
 Gemini Team, Machel Reid, Nikolay Savinov, et al. 2024. Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens of Context. arXiv:2403.05530 [cs.CL].
 
-\bibitem{liu2024visual}
-Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2024. Visual Instruction Tuning and VLM Evaluation Frameworks. Advances in Neural Information Processing Systems 37 (NeurIPS).
+\bibitem{liu2023visual}
+Haotian Liu, Chunyuan Li, Qingyang Wu, et al. 2023. Visual Instruction Tuning. Advances in Neural Information Processing Systems 36 (2023), 34892--34916.
 
 \bibitem{pydantic2025}
 Pydantic Core Team. 2025. Pydantic: Data validation using Python type hints. Software Documentation. Retrieved from https://pydantic.dev/.
