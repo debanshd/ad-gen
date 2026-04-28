@@ -111,7 +111,7 @@ Recent advancements in generative video models demonstrate high visual fidelity,
 
 \section{Introduction}
 
-The landscape of generative artificial intelligence has expanded from text and static imagery synthesis to high-fidelity video generation. Foundational models \cite{brooks2024video, veoteam2025} demonstrate substantial capabilities in synthesizing complex motion and scenes from natural language inputs. However, deploying these models in enterprise environments is severely bottlenecked by the inherent limitations of zero-shot, monolithic architectures \cite{zaharia2024shift}. Primary among these limitations are temporal inconsistencies, where spatial representations of objects degrade or morph across frames \cite{blattmann2024temporal}, and a profound lack of brand alignment. In commercial contexts, generative models frequently violate strict corporate identity guidelines or hallucinate unauthorized visual elements, rendering the outputs unusable for enterprise applications \cite{ji2023survey}.
+The landscape of generative artificial intelligence has expanded from text and static imagery synthesis to high-fidelity video generation. Foundational models \cite{brooks2024video, veoteam2025} demonstrate substantial capabilities in synthesizing complex motion and scenes from natural language inputs. However, deploying these models in enterprise environments is severely bottlenecked by the inherent limitations of zero-shot, monolithic architectures \cite{zaharia2024shift}. Primary among these limitations are temporal inconsistencies, where spatial representations of objects degrade or morph across frames \cite{blattmann2023stable}, and a profound lack of brand alignment. In commercial contexts, generative models frequently violate strict corporate identity guidelines or hallucinate unauthorized visual elements, rendering the outputs unusable for enterprise applications \cite{ji2023survey}.
 
 To address these structural bottlenecks, systems research is shifting from relying on isolated models to engineering Compound AI Systems \cite{zaharia2024shift}. These architectures integrate multiple interacting components, including specialized generative models, external retrieval mechanisms, deterministic tools, and programmatic validation loops, to execute complex tasks that exceed the zero-shot reliability of single models. While advanced prompting topologies can influence model output, they fail to provide the deterministic constraints required by commercial pipelines, which necessitate strict adherence to predefined visual parameters and narrative coherence. The gap between probabilistic generation and deterministic enterprise requirements necessitates a robust systems-level intervention.
 
@@ -146,7 +146,7 @@ Simultaneously, the system executes an asset normalization phase. Enterprise env
 
 With the BrandDNA instantiated and the visual assets normalized, the pipeline advances to the orchestration phase. Gemini 3.1 Pro assumes the role of the primary routing agent, designated the ``Director.'' Bypassing generic prompt templates, the Director synthesizes the Pydantic constraints and the specific campaign objective to author a highly parameterized, scene-by-scene script matrix. Each scene vector contains technical metadata, including simulated camera angle, focal length, lighting conditions, and designated subject motion vectors.
 
-Translating a multi-scene script matrix into a cohesive video introduces the fundamental challenge of temporal inconsistency. Foundational video models frequently fail to maintain subject permanence and spatial coherence across distinct generation calls \cite{blattmann2024temporal}. To address this, Genflow employs step-by-step state passing \cite{blattmann2024align}.
+Translating a multi-scene script matrix into a cohesive video introduces the fundamental challenge of temporal inconsistency. Foundational video models frequently fail to maintain subject permanence and spatial coherence across distinct generation calls \cite{blattmann2023stable}. To address this, Genflow employs step-by-step state passing \cite{blattmann2024align}.
 
 When the underlying Veo model finishes rendering Scene $N$, the pipeline programmatically extracts the final frame of the resulting output. This specific pixel array is then injected as the visual reference frame, the starting state, for the inference of Scene $N+1$, alongside the Director's text instructions. By forcing the Veo model to initialize subsequent generations using the exact visual configuration of the preceding frame, we enforce strict initial state continuity. This state-passing mechanism connects isolated video generations into a cohesive, structurally permanent narrative flow.
 
@@ -275,8 +275,8 @@ Veo Team. 2025. Veo 3 Technical Report. Google DeepMind. Retrieved April 28, 202
 \bibitem{zaharia2024shift}
 Matei Zaharia, Omar Khattab, Lingjiao Chen, et al. 2024. The Shift from Models to Compound AI Systems. Berkeley AI Research Blog. Retrieved April 28, 2026 from https://bair.berkeley.edu/blog/2024/02/18/compound-ai-systems/
 
-\bibitem{blattmann2024temporal}
-Andreas Blattmann, Johannes Rombach, and Robin Rombach. 2024. Temporal Inconsistencies and Artifacts in Diffusion-Based Video Generation. arXiv:2403.01121.
+\bibitem{blattmann2023stable}
+Andreas Blattmann, Tim Dockhorn, Sumith Kulal, et al. 2023. Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets. arXiv:2311.15127 [cs.CV].
 
 \bibitem{ji2023survey}
 Ziwei Ji, Nayeon Lee, Rita Frieske, et al. 2023. Survey of Hallucination in Natural Language Generation. ACM Computing Surveys 55, 12, Article 248.
