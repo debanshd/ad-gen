@@ -138,7 +138,7 @@ Genflow is engineered as a Compound AI System, moving beyond isolated inference 
 
 The foundational phase of the Genflow pipeline involves grounding the generative models in deterministic, client-specific parameters. To mitigate the subjectivity and probabilistic variance inherent in manual prompt engineering, we developed an automated extraction module to synthesize a foundational ``Brand DNA'' schema. The system utilizes \texttt{httpx} to manage asynchronous, non-blocking network I/O requests, coupled with \texttt{BeautifulSoup} to parse the Document Object Model (DOM) and Cascading Style Sheets (CSS) of the target enterprise's provided web properties.
 
-Once the raw HTML structure and stylistic payloads are ingested, Gemini 3.1 Pro operates as an intermediate information extraction agent \cite{li2024structured}. It traverses the unstructured DOM data and outputs a strictly typed Pydantic model \cite{pydantic2025}. This schema enforces rigid programmatic constraints by explicitly defining variables for approved hex colors, typography families, tonal voice parameters, and forbidden visual tropes, acting as the ground truth for generative calls.
+Once the raw HTML structure and stylistic payloads are ingested, Gemini 3.1 Pro operates as an intermediate information extraction agent \cite{wu2024learning}. It traverses the unstructured DOM data and outputs a strictly typed Pydantic model \cite{pydantic2025}. This schema enforces rigid programmatic constraints by explicitly defining variables for approved hex colors, typography families, tonal voice parameters, and forbidden visual tropes, acting as the ground truth for generative calls.
 
 Simultaneously, the system executes an asset normalization phase. Enterprise environments frequently supply noisy, poorly illuminated, or low-resolution product imagery. Because video diffusion models compound artifacts present in visual reference frames, we route these source assets through Nano Banana 2. Rather than relying on basic upscaling, Nano Banana 2 executes a targeted image-to-image enhancement pass. It utilizes the typed BrandDNA object to condition the diffusion process, upgrading the source assets into high-fidelity reference images with normalized illumination and clean background isolation \cite{ramesh2022high}. These enhanced assets form the visual baseline for the subsequent video generation phases.
 
@@ -299,8 +299,8 @@ Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, et al. 2024. DSPy: Compiling De
 \bibitem{chase2022langchain}
 Harrison Chase. 2022. LangChain. GitHub. Retrieved April 28, 2026 from https://github.com/langchain-ai/langchain
 
-\bibitem{li2024structured}
-Jiacheng Li, Yujie Tang, and Yejin Choi. 2024. Structured Information Extraction from the Web using Large Language Models. Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL).
+\bibitem{wu2024learning}
+Haolun Wu, Ye Yuan, Liana Mikaelyan, et al. 2024. Learning to Extract Structured Entities Using Language Models. Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing (EMNLP). 6817--6834.
 
 \bibitem{ramesh2022high}
 Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. 2022. High-Fidelity Image Synthesis and Editing with Text-to-Image Diffusion Models. arXiv:2204.06125.
