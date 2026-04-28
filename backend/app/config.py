@@ -21,12 +21,13 @@ class Settings(BaseSettings):
     project_id: str = ""
     region: str = "global"
     gcs_bucket_name: str = ""
+    gemini_api_key: str = ""
 
     gemini_model: str = Field(
-        default="gemini-3-flash-preview",
+        default="gemini-1.5-flash",
         validation_alias=AliasChoices("gemini_model", "GEMINI_MODEL"),
     )
-    gemini_flash_model: str = "gemini-3-flash-preview"
+    gemini_flash_model: str = "gemini-1.5-flash"
     image_model: str = Field(
         default="gemini-3-pro-image-preview",
         validation_alias=AliasChoices("image_model", "IMAGE_MODEL"),
