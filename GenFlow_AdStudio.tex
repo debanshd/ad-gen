@@ -140,7 +140,7 @@ The foundational phase of the Genflow pipeline involves grounding the generative
 
 Once the raw HTML structure and stylistic payloads are ingested, Gemini 3.1 Pro operates as an intermediate information extraction agent \cite{wu2024learning}. It traverses the unstructured DOM data and outputs a strictly typed Pydantic model \cite{pydantic2025}. This schema enforces rigid programmatic constraints by explicitly defining variables for approved hex colors, typography families, tonal voice parameters, and forbidden visual tropes, acting as the ground truth for generative calls.
 
-Simultaneously, the system executes an asset normalization phase. Enterprise environments frequently supply noisy, poorly illuminated, or low-resolution product imagery. Because video diffusion models compound artifacts present in visual reference frames, we route these source assets through Nano Banana 2. Rather than relying on basic upscaling, Nano Banana 2 executes a targeted image-to-image enhancement pass. It utilizes the typed BrandDNA object to condition the diffusion process, upgrading the source assets into high-fidelity reference images with normalized illumination and clean background isolation \cite{ramesh2022high}. These enhanced assets form the visual baseline for the subsequent video generation phases.
+Simultaneously, the system executes an asset normalization phase. Enterprise environments frequently supply noisy, poorly illuminated, or low-resolution product imagery. Because video diffusion models compound artifacts present in visual reference frames, we route these source assets through Nano Banana 2. Rather than relying on basic upscaling, Nano Banana 2 executes a targeted image-to-image enhancement pass. It utilizes the typed BrandDNA object to condition the diffusion process, upgrading the source assets into high-fidelity reference images with normalized illumination and clean background isolation \cite{ramesh2022hierarchical}. These enhanced assets form the visual baseline for the subsequent video generation phases.
 
 \subsection{Orchestration \& State Passing}
 
@@ -302,8 +302,8 @@ Harrison Chase. 2022. LangChain. GitHub. Retrieved April 28, 2026 from https://g
 \bibitem{wu2024learning}
 Haolun Wu, Ye Yuan, Liana Mikaelyan, et al. 2024. Learning to Extract Structured Entities Using Language Models. Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing (EMNLP). 6817--6834.
 
-\bibitem{ramesh2022high}
-Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. 2022. High-Fidelity Image Synthesis and Editing with Text-to-Image Diffusion Models. arXiv:2204.06125.
+\bibitem{ramesh2022hierarchical}
+Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, et al. 2022. Hierarchical Text-Conditional Image Generation with CLIP Latents. arXiv:2204.06125 [cs.CV].
 
 \bibitem{blattmann2024align}
 Andreas Blattmann, Robin Rombach, Huan Ling, et al. 2024. Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR).
