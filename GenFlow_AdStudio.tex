@@ -132,7 +132,7 @@ By coupling specialized models for asset generation with self-reflecting, advers
   \label{fig:dag}
 \end{figure*}
 
-Genflow is engineered as a Compound AI System, moving beyond isolated inference toward a robust, state-managed execution pipeline \cite{wu2023autogen}. The architecture operates primarily as a Directed Acyclic Graph (DAG) for data ingestion and script orchestration \cite{khattab2024dspy, chase2023langchain}, which subsequently transitions into a cyclic, self-correcting evaluation loop during the generation phase. This section details the three primary subsystems that constitute the Genflow pipeline: deterministic constraint extraction, multi-scene script coordination, and concurrent multi-agent validation.
+Genflow is engineered as a Compound AI System, moving beyond isolated inference toward a robust, state-managed execution pipeline \cite{wu2024autogen}. The architecture operates primarily as a Directed Acyclic Graph (DAG) for data ingestion and script orchestration \cite{khattab2024dspy, chase2023langchain}, which subsequently transitions into a cyclic, self-correcting evaluation loop during the generation phase. This section details the three primary subsystems that constitute the Genflow pipeline: deterministic constraint extraction, multi-scene script coordination, and concurrent multi-agent validation.
 
 \subsection{Brand DNA \& Pre-processing}
 
@@ -165,7 +165,7 @@ If both agents return valid for compliance, the scene is committed to the final 
 
 Implementing this cyclic, multi-agent evaluation introduces a non-trivial trade-off between system latency and output quality. While traditional single-pass generation yields an asset with a linear inference cost, our adversarial loop operates with a highly variable latency multiplier based on the number of required refinement iterations. This fundamentally increases the total pipeline execution time and computational overhead. However, in enterprise environments where the cost of a brand violation significantly outweighs the cost of increased generation time, prioritizing deterministic quality over raw throughput is a necessary and acceptable systems engineering compromise.
 
-Genflow's cyclic Directed Acyclic Graph (DAG) workflow integrates directly with modern agentic solutions. The declarative boundaries synthesized in the Pydantic Brand DNA directly align with the compilation strategies of \texttt{DSPy} \cite{khattab2024dspy}, where constraints are programmatically compiled into optimized prompt parameters. Furthermore, the message-passing loop between the Director, Brand Manager, and Orchestrator agents matches the asynchronous architectures of frameworks like \texttt{AutoGen} \cite{wu2023autogen} and \texttt{Agno}, and can easily be surfaced through commercial Agent Development Kits (ADKs) that rely on explicit telemetry tracing and stateful routing.
+Genflow's cyclic Directed Acyclic Graph (DAG) workflow integrates directly with modern agentic solutions. The declarative boundaries synthesized in the Pydantic Brand DNA directly align with the compilation strategies of \texttt{DSPy} \cite{khattab2024dspy}, where constraints are programmatically compiled into optimized prompt parameters. Furthermore, the message-passing loop between the Director, Brand Manager, and Orchestrator agents matches the asynchronous architectures of frameworks like \texttt{AutoGen} \cite{wu2024autogen} and \texttt{Agno}, and can easily be surfaced through commercial Agent Development Kits (ADKs) that rely on explicit telemetry tracing and stateful routing.
 
 \section{Evaluation and System Contribution}
 
@@ -290,8 +290,8 @@ Tian Liang, Zhiwei He, Wenxiang Jiao, et al. 2024. Encouraging Divergent Thinkin
 \bibitem{shinn2023reflexion}
 Noah Shinn, Federico Cassano, Ashwin Gopinath, et al. 2023. Reflexion: Language Agents with Verbal Reinforcement Learning. Advances in Neural Information Processing Systems 36 (2023), 8634--8652.
 
-\bibitem{wu2023autogen}
-Qingyun Wu, Gagan Bansal, Jieyu Zhang, et al. 2023. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation. arXiv:2308.08155.
+\bibitem{wu2024autogen}
+Qingyun Wu, Gagan Bansal, Jieyu Zhang, et al. 2024. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversations. Proceedings of the First Conference on Language Modeling (COLM). Retrieved April 28, 2026 from https://openreview.net/forum?id=BAakY1hNKS
 
 \bibitem{khattab2024dspy}
 Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, et al. 2024. DSPy: Compiling Declarative Language Model Calls into State-of-the-Art Pipelines. International Conference on Learning Representations (ICLR).
