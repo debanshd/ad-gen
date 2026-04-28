@@ -152,7 +152,7 @@ When the underlying Veo model finishes rendering Scene $N$, the pipeline program
 
 \subsection{Adversarial Quality Control and Latency Trade-offs}
 
-The primary architectural contribution of Genflow is its cyclic, self-correcting generation loop. Foundational generative models natively lack self-reflection; they cannot deterministically verify if their output adheres to the requested constraints. To bridge this verification gap, we implemented an Adversarial Quality Control loop powered by multiple parallel Vision-Language Models (VLMs) \cite{deepmind2024advanced}.
+The primary architectural contribution of Genflow is its cyclic, self-correcting generation loop. Foundational generative models natively lack self-reflection; they cannot deterministically verify if their output adheres to the requested constraints. To bridge this verification gap, we implemented an Adversarial Quality Control loop powered by multiple parallel Vision-Language Models (VLMs) \cite{geminiteam2024gemini}.
 
 Following the generation of a scene by Veo, the pipeline suspends the standard DAG progression and triggers a multi-agent evaluation phase. To minimize the temporal overhead of this verification step, the system utilizes \texttt{asyncio.gather} for parallel, concurrent execution of the evaluator agents. Two distinct, role-prompted agents inspect the generated output:
 
@@ -308,8 +308,8 @@ Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, et al. 2022. Hierarchical Text-Co
 \bibitem{blattmann2023align}
 Andreas Blattmann, Robin Rombach, Huan Ling, et al. 2023. Align Your Latents: High-Resolution Video Synthesis with Latent Diffusion Models. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). 22563--22575.
 
-\bibitem{deepmind2024advanced}
-Google DeepMind. 2024. Advanced Video Generation using Veo: Architecture and Capabilities. Technical Report.
+\bibitem{geminiteam2024gemini}
+Gemini Team, Machel Reid, Nikolay Savinov, et al. 2024. Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens of Context. arXiv:2403.05530 [cs.CL].
 
 \bibitem{liu2024visual}
 Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2024. Visual Instruction Tuning and VLM Evaluation Frameworks. Advances in Neural Information Processing Systems 37 (NeurIPS).
