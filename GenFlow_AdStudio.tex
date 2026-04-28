@@ -146,7 +146,7 @@ Simultaneously, the system executes an asset normalization phase. Enterprise env
 
 With the BrandDNA instantiated and the visual assets normalized, the pipeline advances to the orchestration phase. Gemini 3.1 Pro assumes the role of the primary routing agent, designated the ``Director.'' Bypassing generic prompt templates, the Director synthesizes the Pydantic constraints and the specific campaign objective to author a highly parameterized, scene-by-scene script matrix. Each scene vector contains technical metadata, including simulated camera angle, focal length, lighting conditions, and designated subject motion vectors.
 
-Translating a multi-scene script matrix into a cohesive video introduces the fundamental challenge of temporal inconsistency. Foundational video models frequently fail to maintain subject permanence and spatial coherence across distinct generation calls \cite{blattmann2023stable}. To address this, Genflow employs step-by-step state passing \cite{blattmann2024align}.
+Translating a multi-scene script matrix into a cohesive video introduces the fundamental challenge of temporal inconsistency. Foundational video models frequently fail to maintain subject permanence and spatial coherence across distinct generation calls \cite{blattmann2023stable}. To address this, Genflow employs step-by-step state passing \cite{blattmann2023align}.
 
 When the underlying Veo model finishes rendering Scene $N$, the pipeline programmatically extracts the final frame of the resulting output. This specific pixel array is then injected as the visual reference frame, the starting state, for the inference of Scene $N+1$, alongside the Director's text instructions. By forcing the Veo model to initialize subsequent generations using the exact visual configuration of the preceding frame, we enforce strict initial state continuity. This state-passing mechanism connects isolated video generations into a cohesive, structurally permanent narrative flow.
 
@@ -305,8 +305,8 @@ Haolun Wu, Ye Yuan, Liana Mikaelyan, et al. 2024. Learning to Extract Structured
 \bibitem{ramesh2022hierarchical}
 Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, et al. 2022. Hierarchical Text-Conditional Image Generation with CLIP Latents. arXiv:2204.06125 [cs.CV].
 
-\bibitem{blattmann2024align}
-Andreas Blattmann, Robin Rombach, Huan Ling, et al. 2024. Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR).
+\bibitem{blattmann2023align}
+Andreas Blattmann, Robin Rombach, Huan Ling, et al. 2023. Align Your Latents: High-Resolution Video Synthesis with Latent Diffusion Models. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). 22563--22575.
 
 \bibitem{deepmind2024advanced}
 Google DeepMind. 2024. Advanced Video Generation using Veo: Architecture and Capabilities. Technical Report.
