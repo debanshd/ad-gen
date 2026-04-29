@@ -1,0 +1,79 @@
+\begin{thebibliography}{99}
+\sloppy
+
+\bibitem{brooks2024video}
+Tim Brooks, Bill Peebles, Connor Holmes, et al. 2024. Video generation models as world simulators. OpenAI Blog. Retrieved April 28, 2026 from https://openai.com/research/video-generation-models-as-world-simulators
+
+\bibitem{veoteam2025}
+Veo Team. 2025. Veo 3 Technical Report. Google DeepMind. Retrieved April 28, 2026 from https://storage.googleapis.com/deepmind-media/veo/Veo-3-Tech-Report.pdf
+
+\bibitem{zaharia2024shift}
+Matei Zaharia, Omar Khattab, Lingjiao Chen, et al. 2024. The Shift from Models to Compound AI Systems. Berkeley AI Research Blog. Retrieved April 28, 2026 from https://bair.berkeley.edu/blog/2024/02/18/compound-ai-systems/
+
+\bibitem{blattmann2023stable}
+Andreas Blattmann, Tim Dockhorn, Sumith Kulal, et al. 2023. Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets. arXiv:2311.15127 [cs.CV].
+
+\bibitem{ji2023survey}
+Ziwei Ji, Nayeon Lee, Rita Frieske, et al. 2023. Survey of Hallucination in Natural Language Generation. ACM Computing Surveys 55, 12 (2023), 1--38.
+
+\bibitem{du2024improving}
+Yilun Du, Shuang Li, Antonio Torralba, et al. 2024. Improving Factuality and Reasoning in Language Models through Multiagent Debate. Proceedings of the 41st International Conference on Machine Learning (PMLR 235), 11733--11763.
+
+\bibitem{liang2024encouraging}
+Tian Liang, Zhiwei He, Wenxiang Jiao, et al. 2024. Encouraging Divergent Thinking in Large Language Models through Multi-Agent Debate. Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing (EMNLP), 17889--17904.
+
+\bibitem{shinn2023reflexion}
+Noah Shinn, Federico Cassano, Ashwin Gopinath, et al. 2023. Reflexion: Language Agents with Verbal Reinforcement Learning. Advances in Neural Information Processing Systems 36 (2023), 8634--8652.
+
+\bibitem{wu2024autogen}
+Qingyun Wu, Gagan Bansal, Jieyu Zhang, et al. 2024. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversations. Proceedings of the First Conference on Language Modeling (COLM). Retrieved April 28, 2026 from https://openreview.net/forum?id=BAakY1hNKS
+
+\bibitem{khattab2024dspy}
+Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, et al. 2024. DSPy: Compiling Declarative Language Model Calls into State-of-the-Art Pipelines. Proceedings of the Twelfth International Conference on Learning Representations (ICLR). Retrieved April 28, 2026 from https://openreview.net/forum?id=sY5N0zY5Od
+
+\bibitem{chase2022langchain}
+Harrison Chase. 2022. LangChain. GitHub. Retrieved April 28, 2026 from https://github.com/langchain-ai/langchain
+
+\bibitem{wu2024learning}
+Haolun Wu, Ye Yuan, Liana Mikaelyan, et al. 2024. Learning to Extract Structured Entities Using Language Models. Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing (EMNLP). 6817--6834.
+
+\bibitem{ramesh2022hierarchical}
+Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, et al. 2022. Hierarchical Text-Conditional Image Generation with CLIP Latents. arXiv:2204.06125 [cs.CV].
+
+\bibitem{blattmann2023align}
+Andreas Blattmann, Robin Rombach, Huan Ling, et al. 2023. Align Your Latents: High-Resolution Video Synthesis with Latent Diffusion Models. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). 22563--22575.
+
+\bibitem{geminiteam2024gemini}
+Gemini Team, Machel Reid, Nikolay Savinov, et al. 2024. Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens of Context. arXiv:2403.05530 [cs.CL].
+
+\bibitem{liu2023visual}
+Haotian Liu, Chunyuan Li, Qingyang Wu, et al. 2023. Visual Instruction Tuning. Advances in Neural Information Processing Systems 36 (2023), 34892--34916.
+
+\bibitem{pydantic2025}
+Pydantic Core Team. 2025. Pydantic: Data validation using Python type hints. Software Documentation. Retrieved April 28, 2026 from https://pydantic.dev/
+
+\bibitem{heusel2017gans}
+Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, et al. 2017. GANs trained by a two time-scale update rule converge to a local Nash equilibrium. Advances in Neural Information Processing Systems 30 (2017).
+
+\bibitem{unterthiner2018towards}
+Thomas Unterthiner, Sjoerd van Steenkiste, Karol Kurach, et al. 2018. Towards accurate generative models of video: A new metric \& challenges. arXiv:1812.01717.
+
+\bibitem{zheng2023judging}
+Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, et al. 2023. Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. Advances in Neural Information Processing Systems 36 (2023), 46595--46623.
+
+\bibitem{wei2022chain}
+Jason Wei, Xuezhi Wang, Dale Schuurmans, et al. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. Advances in Neural Information Processing Systems 35 (2022), 24824--24837.
+
+\bibitem{yao2022react}
+Shunyu Yao, Jeffrey Zhao, Dian Yu, et al. 2023. ReAct: Synergizing Reasoning and Acting in Language Models. International Conference on Learning Representations (ICLR). Retrieved April 28, 2026 from \url{https://openreview.net/forum?id=WE_vluYUL-X}
+
+\bibitem{achiam2023gpt}
+Josh Achiam, Steven Adler, Sandhini Agarwal, et al. 2023. GPT-4 Technical Report. arXiv:2303.08774.
+
+\bibitem{touvron2023llama}
+Hugo Touvron, Louis Martin, Kevin Stone, et al. 2023. Llama 2: Open Foundation and Fine-Tuned Chat Models. arXiv:2307.09288.
+
+\bibitem{vaswani2017attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, et al. 2017. Attention Is All You Need. Advances in Neural Information Processing Systems 30 (2017).
+
+\end{thebibliography}
